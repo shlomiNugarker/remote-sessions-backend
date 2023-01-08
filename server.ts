@@ -31,8 +31,8 @@ if (process.env.NODE_ENV === 'production') {
   app.use(cors(corsOptions))
 }
 
-import codeRoutes from './api/code/codeRoutes'
-app.use('/api/code', codeRoutes)
+import codeBlockRoutes from './api/code/codeBlockRoutes'
+app.use('/api/code', codeBlockRoutes)
 
 app.get('/**', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'))
