@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express'
+import express, { Express } from 'express'
 import { json } from 'body-parser'
 import expressSession from 'express-session'
 import path from 'path'
@@ -30,6 +30,9 @@ if (process.env.NODE_ENV === 'production') {
   }
   app.use(cors(corsOptions))
 }
+
+import codeRoutes from './api/code/codeRoutes'
+app.use('/api/code', codeRoutes)
 
 app.get('/**', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'))

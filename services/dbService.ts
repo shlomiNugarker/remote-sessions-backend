@@ -4,7 +4,7 @@ import config from '../config/index'
 
 export default { getCollection }
 
-const dbName = 'code_db'
+const dbName = 'remote_sessions_db'
 
 var dbConn: any = null
 
