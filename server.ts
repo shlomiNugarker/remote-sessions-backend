@@ -3,6 +3,9 @@ import { json } from 'body-parser'
 import expressSession from 'express-session'
 import path from 'path'
 import cors from 'cors'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const app: Express = express()
 const http = require('http').createServer(app)
