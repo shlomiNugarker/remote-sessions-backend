@@ -2,12 +2,12 @@ import { Socket } from 'socket.io'
 
 let gIo: any
 
-interface IWatching {
+interface IgWatchingOnCodeBlocks {
   [key: string]: string[] // key-codeBlockId, value- sockets-ids
 }
 
-let connectedSockets: string[] = []
-const watchingOnCodeBlocks: IWatching = {}
+let gConnectedSockets: string[] = []
+const gWatchingOnCodeBlocks: IgWatchingOnCodeBlocks = {}
 
 function connectSockets(http: any, session: any) {
   gIo = require('socket.io')(http, {
@@ -19,46 +19,67 @@ function connectSockets(http: any, session: any) {
 
   gIo &&
     gIo.on('connection', (socket: Socket) => {
-      if (!connectedSockets.includes(socket.id))
-        connectedSockets.push(socket.id)
-      console.log({ connectedSockets })
-
+      addSocketToConnectedSockets(socket.id)
       // code-block saved
       socket.on('code-block-saved', async (codeBlock) => {
         socket.broadcast.emit('update-code-block', codeBlock)
       })
 
-      // someone is watching code block
+      // someone is watching the code-block-page
       socket.on('someone-enter-code-block', async (codeBlockId) => {
-        if (!watchingOnCodeBlocks[codeBlockId])
-          watchingOnCodeBlocks[codeBlockId] = [socket.id]
-        else if (
-          watchingOnCodeBlocks[codeBlockId] &&
-          !watchingOnCodeBlocks[codeBlockId].includes(socket.id)
-        ) {
-          watchingOnCodeBlocks[codeBlockId].push(socket.id)
-        }
-        console.log({ watchingOnCodeBlocks })
+        addSocketToWatching(codeBlockId, socket)
       })
-      // someone leave the code block
+      // someone leave the code-block-page
       socket.on('someone-leave-code-block', async (codeBlockId) => {
-        if (watchingOnCodeBlocks[codeBlockId]) {
-          watchingOnCodeBlocks[codeBlockId] = watchingOnCodeBlocks[
-            codeBlockId
-          ].filter((socketId) => socketId !== socket.id)
-        }
-        console.log({ watchingOnCodeBlocks })
+        removeSocketFromWatching(codeBlockId, socket.id)
       })
 
       // browser disconnected
       socket.on('disconnect', async () => {
-        // console.log('someone disconnected, with socketId:', socket.id)
-        connectedSockets = connectedSockets.filter(
-          (socketId) => socketId !== socket.id
-        )
-        console.log({ connectedSockets })
+        removeConnectedSocket(socket.id)
+        findAndRemoveCodeBlockOfWatchingSocket(socket.id)
       })
     })
+}
+
+function findAndRemoveCodeBlockOfWatchingSocket(socketId: string) {
+  for (const codeBlockId in gWatchingOnCodeBlocks) {
+    if (gWatchingOnCodeBlocks[codeBlockId].includes(socketId)) {
+      removeSocketFromWatching(codeBlockId, socketId)
+    }
+  }
+}
+
+function removeConnectedSocket(socketIdToRemove: string) {
+  gConnectedSockets = gConnectedSockets.filter(
+    (socketId) => socketId !== socketIdToRemove
+  )
+}
+
+function addSocketToConnectedSockets(socketId: string) {
+  if (!gConnectedSockets.includes(socketId)) gConnectedSockets.push(socketId)
+}
+
+function addSocketToWatching(codeBlockId: string, socket: Socket) {
+  if (!gWatchingOnCodeBlocks[codeBlockId])
+    gWatchingOnCodeBlocks[codeBlockId] = [socket.id]
+  else if (
+    gWatchingOnCodeBlocks[codeBlockId] &&
+    !gWatchingOnCodeBlocks[codeBlockId].includes(socket.id)
+  ) {
+    gWatchingOnCodeBlocks[codeBlockId].push(socket.id)
+  }
+}
+
+function removeSocketFromWatching(
+  codeBlockId: string,
+  socketIdToRemove: string
+) {
+  if (gWatchingOnCodeBlocks[codeBlockId]) {
+    gWatchingOnCodeBlocks[codeBlockId] = gWatchingOnCodeBlocks[
+      codeBlockId
+    ].filter((socketId) => socketId !== socketIdToRemove)
+  }
 }
 
 export default {
