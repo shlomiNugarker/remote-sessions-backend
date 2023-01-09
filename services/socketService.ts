@@ -7,7 +7,7 @@ interface IgWatchingOnCodeBlocks {
 }
 
 let gConnectedSockets: string[] = []
-const gWatchingOnCodeBlocks: IgWatchingOnCodeBlocks = {}
+const gWatchersOnCodeBlocks: IgWatchingOnCodeBlocks = {}
 
 function connectSockets(http: any, session: any) {
   gIo = require('socket.io')(http, {
@@ -16,39 +16,42 @@ function connectSockets(http: any, session: any) {
       pingTimeout: 60000,
     },
   })
-
   gIo.on('connection', (socket: Socket) => {
     addSocketToConnectedSockets(socket.id)
 
     // when code-block saved, updating other users:
     socket.on('code-block-saved', async (codeBlock) => {
-      const socketsIdsToUpdate = gWatchingOnCodeBlocks[codeBlock._id]?.filter(
+      const socketsIdsToUpdate = gWatchersOnCodeBlocks[codeBlock._id]?.filter(
         (socketId) => socketId !== socket.id
       )
       if (socketsIdsToUpdate?.length) {
-        socketsIdsToUpdate.forEach((socketId) => {
-          emitToSocket({
+        socketsIdsToUpdate.forEach(async (socketId) => {
+          await emitToSocket({
             type: 'update-code-block',
             data: codeBlock,
-            socketId: socketId,
+            socketId,
           })
         })
       }
     })
-
     // when someone is watching the code-block-page
     socket.on('someone-enter-code-block', async (codeBlockId) => {
-      addSocketToWatching(codeBlockId, socket)
+      addSocketToWatchers(codeBlockId, socket)
+      send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
     })
     // when someone leave the code-block-page
-    socket.on('someone-leave-code-block', async (codeBlockId) => {
-      removeSocketFromWatching(codeBlockId, socket.id)
+    socket.on('someone-left-code-block', async (codeBlockId) => {
+      removeSocketFromWatchers(codeBlockId, socket.id)
+      await send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
     })
-
     // when browser disconnected
     socket.on('disconnect', async () => {
       removeConnectedSocket(socket.id)
-      findAndRemoveSocketInWatchingSockets(socket.id)
+      find_And_Remove_Socket_In_Watcher_Sockets(socket.id)
+
+      for (const codeBlockId in gWatchersOnCodeBlocks) {
+        send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
+      }
     })
   })
 }
@@ -63,20 +66,37 @@ async function emitToSocket({ type, data, socketId }: any) {
 
 async function getSocketById(socketId: string) {
   const sockets = await getAllSockets()
+  if (!sockets) return
   const socket = sockets.find((s: Socket) => s.id === socketId)
   return socket
 }
 
 async function getAllSockets() {
   if (!gIo) return
-  const sockets = await gIo.fetchSockets()
+  const sockets: Socket[] = await gIo.fetchSockets()
   return sockets
 }
 
-function findAndRemoveSocketInWatchingSockets(socketId: string) {
-  for (const codeBlockId in gWatchingOnCodeBlocks) {
-    if (gWatchingOnCodeBlocks[codeBlockId].includes(socketId)) {
-      removeSocketFromWatching(codeBlockId, socketId)
+// sending watchers to all sockets who watching the code-block:
+async function send_Watcher_On_Code_Block_To_Others_Watchers(
+  codeBlockId: string
+) {
+  const watchersOnSpecificCodeBlock = gWatchersOnCodeBlocks[codeBlockId]
+  watchersOnSpecificCodeBlock?.forEach(async (socketId) => {
+    const socket = await getSocketById(socketId)
+    if (!socket) return
+    socket.emit(
+      'update-watchers-on-specific-code-block',
+      watchersOnSpecificCodeBlock
+    )
+  })
+}
+
+// updating "gWatchersOnCodeBlocks" after browser disconnected:
+function find_And_Remove_Socket_In_Watcher_Sockets(socketId: string) {
+  for (const codeBlockId in gWatchersOnCodeBlocks) {
+    if (gWatchersOnCodeBlocks[codeBlockId].includes(socketId)) {
+      removeSocketFromWatchers(codeBlockId, socketId)
     }
   }
 }
@@ -91,23 +111,23 @@ function addSocketToConnectedSockets(socketId: string) {
   if (!gConnectedSockets.includes(socketId)) gConnectedSockets.push(socketId)
 }
 
-function addSocketToWatching(codeBlockId: string, socket: Socket) {
-  if (!gWatchingOnCodeBlocks[codeBlockId])
-    gWatchingOnCodeBlocks[codeBlockId] = [socket.id]
+function addSocketToWatchers(codeBlockId: string, socket: Socket) {
+  if (!gWatchersOnCodeBlocks[codeBlockId])
+    gWatchersOnCodeBlocks[codeBlockId] = [socket.id]
   else if (
-    gWatchingOnCodeBlocks[codeBlockId] &&
-    !gWatchingOnCodeBlocks[codeBlockId].includes(socket.id)
+    gWatchersOnCodeBlocks[codeBlockId] &&
+    !gWatchersOnCodeBlocks[codeBlockId].includes(socket.id)
   ) {
-    gWatchingOnCodeBlocks[codeBlockId].push(socket.id)
+    gWatchersOnCodeBlocks[codeBlockId].push(socket.id)
   }
 }
 
-function removeSocketFromWatching(
+function removeSocketFromWatchers(
   codeBlockId: string,
   socketIdToRemove: string
 ) {
-  if (gWatchingOnCodeBlocks[codeBlockId]) {
-    gWatchingOnCodeBlocks[codeBlockId] = gWatchingOnCodeBlocks[
+  if (gWatchersOnCodeBlocks[codeBlockId]) {
+    gWatchersOnCodeBlocks[codeBlockId] = gWatchersOnCodeBlocks[
       codeBlockId
     ].filter((socketId) => socketId !== socketIdToRemove)
   }
