@@ -12,7 +12,7 @@ export default {
 async function query() {
   try {
     const collection = await dbService.getCollection('code_block')
-    var codeBlocks = await collection.find({}).toArray()
+    const codeBlocks = await collection.find({}).toArray()
     return codeBlocks
   } catch (err) {
     console.log('cannot find code blocks', err)
@@ -33,7 +33,7 @@ async function getById(codeId: string) {
 
 async function update(codeBlock: any) {
   try {
-    var id = new ObjectId(codeBlock._id)
+    const id = new ObjectId(codeBlock._id)
     delete codeBlock._id
     const collection = await dbService.getCollection('code_block')
     await collection.updateOne({ _id: id }, { $set: { ...codeBlock } })
