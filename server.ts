@@ -5,6 +5,9 @@ import path from 'path'
 import cors from 'cors'
 import dotenv from 'dotenv'
 
+import codeBlockRoutes from './api/codeBlock/codeBlockRoutes'
+import socketService from './services/socketService'
+
 dotenv.config()
 
 const app: Express = express()
@@ -31,8 +34,9 @@ if (process.env.NODE_ENV === 'production') {
   app.use(cors(corsOptions))
 }
 
-import codeBlockRoutes from './api/code/codeBlockRoutes'
-app.use('/api/code', codeBlockRoutes)
+app.use('/api/codeBlock', codeBlockRoutes)
+
+socketService.connectSockets(http, session)
 
 app.get('/**', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'))
