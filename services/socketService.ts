@@ -18,6 +18,7 @@ function connectSockets(http: any, session: any) {
   })
   gIo.on('connection', (socket: Socket) => {
     addSocketToConnectedSockets(socket.id)
+    // console.log({ gWatchersOnCodeBlocks })
 
     // when code-block saved, updating other users:
     socket.on('code-block-saved', async (codeBlock) => {
@@ -36,22 +37,28 @@ function connectSockets(http: any, session: any) {
     })
     // when someone is watching the code-block-page
     socket.on('someone-enter-code-block', async (codeBlockId) => {
+      // console.log('someone-enter-code-block')
       addSocketToWatchers(codeBlockId, socket)
       send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
+      // console.log({ gWatchersOnCodeBlocks })
     })
     // when someone leave the code-block-page
     socket.on('someone-left-code-block', async (codeBlockId) => {
+      // console.log('someone-left-code-block')
       removeSocketFromWatchers(codeBlockId, socket.id)
       await send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
+      // console.log({ gWatchersOnCodeBlocks })
     })
     // when browser disconnected
     socket.on('disconnect', async () => {
+      // console.log('disconnect')
       removeConnectedSocket(socket.id)
       find_And_Remove_Socket_In_Watcher_Sockets(socket.id)
 
       for (const codeBlockId in gWatchersOnCodeBlocks) {
         send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
       }
+      // console.log({ gWatchersOnCodeBlocks })
     })
   })
 }
