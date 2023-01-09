@@ -3,7 +3,7 @@ import { Socket } from 'socket.io'
 let gIo: any
 
 interface IgWatchingOnCodeBlocks {
-  [key: string]: string[] // key-codeBlockId, value- sockets-ids
+  [key: string]: string[] // key-codeBlockId, value- sockets-ids[]
 }
 
 let gConnectedSockets: string[] = []
@@ -17,32 +17,63 @@ function connectSockets(http: any, session: any) {
     },
   })
 
-  gIo &&
-    gIo.on('connection', (socket: Socket) => {
-      addSocketToConnectedSockets(socket.id)
-      // code-block saved
-      socket.on('code-block-saved', async (codeBlock) => {
-        socket.broadcast.emit('update-code-block', codeBlock)
-      })
+  gIo.on('connection', (socket: Socket) => {
+    addSocketToConnectedSockets(socket.id)
 
-      // someone is watching the code-block-page
-      socket.on('someone-enter-code-block', async (codeBlockId) => {
-        addSocketToWatching(codeBlockId, socket)
-      })
-      // someone leave the code-block-page
-      socket.on('someone-leave-code-block', async (codeBlockId) => {
-        removeSocketFromWatching(codeBlockId, socket.id)
-      })
-
-      // browser disconnected
-      socket.on('disconnect', async () => {
-        removeConnectedSocket(socket.id)
-        findAndRemoveCodeBlockOfWatchingSocket(socket.id)
-      })
+    // when code-block saved, updating other users:
+    socket.on('code-block-saved', async (codeBlock) => {
+      const socketsIdsToUpdate = gWatchingOnCodeBlocks[codeBlock._id]?.filter(
+        (socketId) => socketId !== socket.id
+      )
+      if (socketsIdsToUpdate?.length) {
+        socketsIdsToUpdate.forEach((socketId) => {
+          emitToSocket({
+            type: 'update-code-block',
+            data: codeBlock,
+            socketId: socketId,
+          })
+        })
+      }
     })
+
+    // when someone is watching the code-block-page
+    socket.on('someone-enter-code-block', async (codeBlockId) => {
+      addSocketToWatching(codeBlockId, socket)
+    })
+    // when someone leave the code-block-page
+    socket.on('someone-leave-code-block', async (codeBlockId) => {
+      removeSocketFromWatching(codeBlockId, socket.id)
+    })
+
+    // when browser disconnected
+    socket.on('disconnect', async () => {
+      removeConnectedSocket(socket.id)
+      findAndRemoveSocketInWatchingSockets(socket.id)
+    })
+  })
 }
 
-function findAndRemoveCodeBlockOfWatchingSocket(socketId: string) {
+async function emitToSocket({ type, data, socketId }: any) {
+  const socket = await getSocketById(socketId)
+  if (socket) socket.emit(type, data)
+  else {
+    console.log('socket not found')
+  }
+}
+
+async function getSocketById(socketId: string) {
+  const sockets = await getAllSockets()
+  const socket = sockets.find((s: Socket) => s.id === socketId)
+  return socket
+}
+
+async function getAllSockets() {
+  if (!gIo) return
+  const sockets = await gIo.fetchSockets()
+  return sockets
+}
+
+function findAndRemoveSocketInWatchingSockets(socketId: string) {
   for (const codeBlockId in gWatchingOnCodeBlocks) {
     if (gWatchingOnCodeBlocks[codeBlockId].includes(socketId)) {
       removeSocketFromWatching(codeBlockId, socketId)
