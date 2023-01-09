@@ -1,5 +1,6 @@
 const MongoClient = require('mongodb').MongoClient
 
+import { Collection } from 'mongodb'
 import config from '../config/index'
 
 export default { getCollection }
@@ -11,7 +12,7 @@ var dbConn: any = null
 async function getCollection(collectionName: string) {
   try {
     const db = await connect()
-    const collection = await db.collection(collectionName)
+    const collection: Collection = await db.collection(collectionName)
     return collection
   } catch (err) {
     console.log('Failed to get Mongo collection', err)
