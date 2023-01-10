@@ -1,21 +1,21 @@
-import { Collection } from 'mongodb'
 import dbService from '../../services/dbService'
 const ObjectId = require('mongodb').ObjectId
 
 export default {
   getById,
-  query,
+  queryIds,
   update,
   add,
 }
 
-async function query() {
+async function queryIds() {
   try {
     const collection = await dbService.getCollection('code_block')
-    const codeBlocks = await collection.find({}).toArray()
+    const projection = { _id: 1, title: 1 }
+    const codeBlocks = await collection.find({}).project(projection).toArray()
     return codeBlocks
   } catch (err) {
-    console.log('cannot find code blocks', err)
+    // console.log('cannot find code blocks', err)
     throw err
   }
 }
@@ -40,7 +40,7 @@ async function update(codeBlock: any) {
     const savedCodeBlock = { ...codeBlock, _id: id }
     return savedCodeBlock
   } catch (err) {
-    console.log(`Error while update codeBlock: ${codeBlock} `, err)
+    // console.log(`Error while update codeBlock: ${codeBlock} `, err)
     throw err
   }
 }
@@ -52,7 +52,7 @@ async function add(codeBlock: any) {
     await collection.insertOne(codeBlockToAdd)
     return codeBlockToAdd
   } catch (err) {
-    console.log(`Error while add codeBlock: ${codeBlock} `, err)
+    // console.log(`Error while add codeBlock: ${codeBlock} `, err)
     throw err
   }
 }
