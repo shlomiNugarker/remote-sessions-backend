@@ -15,18 +15,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const codeBlockService_1 = __importDefault(require("./codeBlockService"));
 exports.default = {
     getCodeBlock,
-    getCodeBlocks,
+    getCodeBlocksIds,
     updateCodeBlock,
     addCodeBlock,
 };
-function getCodeBlocks(req, res) {
+function getCodeBlocksIds(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const codeBlocks = yield codeBlockService_1.default.query();
+            const codeBlocks = yield codeBlockService_1.default.queryIds();
             res.send(codeBlocks);
         }
         catch (err) {
-            console.log('Failed to get code blocks', err);
+            // console.log('Failed to get code blocks', err)
             res.status(500).send({ err: 'Failed to get code' });
         }
     });
@@ -38,7 +38,7 @@ function getCodeBlock(req, res) {
             res.send(codeBlock);
         }
         catch (err) {
-            console.log('Failed to get code block', err);
+            // console.log('Failed to get code block', err)
             res.status(500).send({ err: 'Failed to get code block' });
         }
     });
@@ -51,7 +51,7 @@ function updateCodeBlock(req, res) {
             res.json(updatedCodeBlock);
         }
         catch (err) {
-            console.log(err);
+            // console.log('Failed to update code block', err)
             res.status(500).send({ err: 'Failed to update codeBlock' });
         }
     });
@@ -64,7 +64,7 @@ function addCodeBlock(req, res) {
             res.json(addedCodeBlock);
         }
         catch (err) {
-            console.log('Failed to add code block', err);
+            // console.log('Failed to add code block', err)
             res.status(500).send({ err: 'Failed to add codeBlock' });
         }
     });

@@ -16,19 +16,20 @@ const dbService_1 = __importDefault(require("../../services/dbService"));
 const ObjectId = require('mongodb').ObjectId;
 exports.default = {
     getById,
-    query,
+    queryIds,
     update,
     add,
 };
-function query() {
+function queryIds() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const collection = yield dbService_1.default.getCollection('code_block');
-            const codeBlocks = yield collection.find({}).toArray();
+            const projection = { _id: 1, title: 1 };
+            const codeBlocks = yield collection.find({}).project(projection).toArray();
             return codeBlocks;
         }
         catch (err) {
-            console.log('cannot find code blocks', err);
+            // console.log('cannot find code blocks', err)
             throw err;
         }
     });
@@ -57,7 +58,7 @@ function update(codeBlock) {
             return savedCodeBlock;
         }
         catch (err) {
-            console.log(`Error while update codeBlock: ${codeBlock} `, err);
+            // console.log(`Error while update codeBlock: ${codeBlock} `, err)
             throw err;
         }
     });
@@ -71,7 +72,7 @@ function add(codeBlock) {
             return codeBlockToAdd;
         }
         catch (err) {
-            console.log(`Error while add codeBlock: ${codeBlock} `, err);
+            // console.log(`Error while add codeBlock: ${codeBlock} `, err)
             throw err;
         }
     });
