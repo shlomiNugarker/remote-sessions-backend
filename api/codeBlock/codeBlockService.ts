@@ -15,7 +15,6 @@ async function queryIds() {
     const codeBlocks = await collection.find({}).project(projection).toArray()
     return codeBlocks
   } catch (err) {
-    // console.log('cannot find code blocks', err)
     throw err
   }
 }
@@ -26,7 +25,6 @@ async function getById(codeId: string) {
     const codeBlock = await collection.findOne({ _id: ObjectId(codeId) })
     return codeBlock
   } catch (err) {
-    console.log(`Error while finding code id: ${codeId} `, err)
     throw err
   }
 }
@@ -40,7 +38,6 @@ async function update(codeBlock: any) {
     const savedCodeBlock = { ...codeBlock, _id: id }
     return savedCodeBlock
   } catch (err) {
-    // console.log(`Error while update codeBlock: ${codeBlock} `, err)
     throw err
   }
 }
@@ -52,7 +49,6 @@ async function add(codeBlock: any) {
     await collection.insertOne(codeBlockToAdd)
     return codeBlockToAdd
   } catch (err) {
-    // console.log(`Error while add codeBlock: ${codeBlock} `, err)
     throw err
   }
 }
