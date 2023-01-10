@@ -29,7 +29,6 @@ function queryIds() {
             return codeBlocks;
         }
         catch (err) {
-            // console.log('cannot find code blocks', err)
             throw err;
         }
     });
@@ -42,7 +41,6 @@ function getById(codeId) {
             return codeBlock;
         }
         catch (err) {
-            console.log(`Error while finding code id: ${codeId} `, err);
             throw err;
         }
     });
@@ -58,7 +56,6 @@ function update(codeBlock) {
             return savedCodeBlock;
         }
         catch (err) {
-            // console.log(`Error while update codeBlock: ${codeBlock} `, err)
             throw err;
         }
     });
@@ -72,7 +69,6 @@ function add(codeBlock) {
             return codeBlockToAdd;
         }
         catch (err) {
-            // console.log(`Error while add codeBlock: ${codeBlock} `, err)
             throw err;
         }
     });

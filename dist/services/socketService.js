@@ -21,7 +21,6 @@ function connectSockets(http, session) {
     });
     gIo.on('connection', (socket) => {
         addSocketToConnectedSockets(socket.id);
-        // console.log({ gWatchersOnCodeBlocks })
         // when code-block saved, updating other users:
         socket.on('code-block-saved', (codeBlock) => __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -38,27 +37,21 @@ function connectSockets(http, session) {
         }));
         // when someone is watching the code-block-page
         socket.on('someone-enter-code-block', (codeBlockId) => __awaiter(this, void 0, void 0, function* () {
-            // console.log('someone-enter-code-block')
             addSocketToWatchers(codeBlockId, socket);
             send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId);
-            // console.log({ gWatchersOnCodeBlocks })
         }));
         // when someone leave the code-block-page
         socket.on('someone-left-code-block', (codeBlockId) => __awaiter(this, void 0, void 0, function* () {
-            // console.log('someone-left-code-block')
             removeSocketFromWatchers(codeBlockId, socket.id);
             yield send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId);
-            // console.log({ gWatchersOnCodeBlocks })
         }));
         // when browser disconnected
         socket.on('disconnect', () => __awaiter(this, void 0, void 0, function* () {
-            // console.log('disconnect')
             removeConnectedSocket(socket.id);
             find_And_Remove_Socket_In_Watcher_Sockets(socket.id);
             for (const codeBlockId in gWatchersOnCodeBlocks) {
                 send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId);
             }
-            // console.log({ gWatchersOnCodeBlocks })
         }));
     });
 }

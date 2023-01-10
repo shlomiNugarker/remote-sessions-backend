@@ -26,7 +26,6 @@ function getCodeBlocksIds(req, res) {
             res.send(codeBlocks);
         }
         catch (err) {
-            // console.log('Failed to get code blocks', err)
             res.status(500).send({ err: 'Failed to get code' });
         }
     });
@@ -38,7 +37,6 @@ function getCodeBlock(req, res) {
             res.send(codeBlock);
         }
         catch (err) {
-            // console.log('Failed to get code block', err)
             res.status(500).send({ err: 'Failed to get code block' });
         }
     });
@@ -51,7 +49,6 @@ function updateCodeBlock(req, res) {
             res.json(updatedCodeBlock);
         }
         catch (err) {
-            // console.log('Failed to update code block', err)
             res.status(500).send({ err: 'Failed to update codeBlock' });
         }
     });
@@ -64,7 +61,6 @@ function addCodeBlock(req, res) {
             res.json(addedCodeBlock);
         }
         catch (err) {
-            // console.log('Failed to add code block', err)
             res.status(500).send({ err: 'Failed to add codeBlock' });
         }
     });

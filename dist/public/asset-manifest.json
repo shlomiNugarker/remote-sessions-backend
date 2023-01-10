@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.6d697635.css",
-    "main.js": "/static/js/main.8758c9ae.js",
+    "main.css": "/static/css/main.ae29b2d3.css",
+    "main.js": "/static/js/main.2476b1f9.js",
     "static/js/27.262d8d9e.chunk.js": "/static/js/27.262d8d9e.chunk.js",
     "worker-xquery.js": "/91f49599a810af1ed0c1a351f14ac99e.js",
     "worker-javascript.js": "/3c9439fce81cf3226f62896ca463e8ca.js",
@@ -35,6 +35,7 @@
     "mode-visualforce.js": "/fc2c1d48fae7bb55b997e42e6186360b.js",
     "mode-coldfusion.js": "/18f127ef6adaaa44a6e2fb644b93b799.js",
     "mode-handlebars.js": "/1ae81db67c5f8d029d08ff85a015fc16.js",
+    "static/media/loading.gif": "/static/media/loading.1332ecdcdb540bbf2090.gif",
     "mode-django.js": "/964c20018a0ed8d9df087e1e2b7ff42d.js",
     "mode-curly.js": "/ad1b9015520f163ed0bf785c97b7f901.js",
     "mode-pgsql.js": "/b99c927abd07de0ea6f6b5f26de5857a.js",
@@ -449,7 +450,7 @@
     "mode-text.js": "/0ffb18fb70c87335edee31a479f58a43.js"
   },
   "entrypoints": [
-    "static/css/main.6d697635.css",
-    "static/js/main.8758c9ae.js"
+    "static/css/main.ae29b2d3.css",
+    "static/js/main.2476b1f9.js"
   ]
 }

@@ -25,7 +25,6 @@ function getCollection(collectionName) {
             return collection;
         }
         catch (err) {
-            // console.log('Failed to get Mongo collection', err)
             throw err;
         }
     });
@@ -44,7 +43,6 @@ function connect() {
             return db;
         }
         catch (err) {
-            // console.log("Can't Connect to DB", err)
             throw err;
         }
     });
