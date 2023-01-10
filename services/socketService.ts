@@ -84,7 +84,7 @@ async function getAllSockets() {
   return sockets
 }
 
-// sending watchers to all sockets who watching the code-block:
+// sending watchers to all sockets who watching the specific code-block:
 async function send_Watcher_On_Code_Block_To_Others_Watchers(
   codeBlockId: string
 ) {
