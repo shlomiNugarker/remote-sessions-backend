@@ -1,4 +1,9 @@
 import { Socket } from 'socket.io'
+import { ICodeBlock } from '../interfaces/ICodeBlock'
+
+export default {
+  connectSockets,
+}
 
 let gIo: any
 
@@ -19,7 +24,8 @@ function connectSockets(http: any, session: any) {
   gIo.on('connection', (socket: Socket) => {
     addSocketToConnectedSockets(socket.id)
     // when code-block saved, updating other users:
-    socket.on('code-block-saved', async (codeBlock) => {
+    socket.on('code-block-saved', async (codeBlock: ICodeBlock) => {
+      if (!codeBlock._id) return
       const socketsIdsToUpdate = gWatchersOnCodeBlocks[codeBlock._id]?.filter(
         (socketId) => socketId !== socket.id
       )
@@ -54,7 +60,18 @@ function connectSockets(http: any, session: any) {
     })
   })
 }
-async function emitToSocket({ type, data, socketId }: any) {
+
+// Functions:
+
+async function emitToSocket({
+  type,
+  data,
+  socketId,
+}: {
+  type: string
+  data: ICodeBlock
+  socketId: string
+}) {
   const socket = await getSocketById(socketId)
   if (socket) socket.emit(type, data)
   else {
@@ -121,8 +138,4 @@ function removeSocketFromWatchers(
       codeBlockId
     ].filter((socketId) => socketId !== socketIdToRemove)
   }
-}
-
-export default {
-  connectSockets,
 }

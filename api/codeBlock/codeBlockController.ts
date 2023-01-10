@@ -1,3 +1,4 @@
+import { ICodeBlock } from '../../interfaces/ICodeBlock'
 import codeBlockService from './codeBlockService'
 import { Request, Response } from 'express'
 
@@ -27,7 +28,7 @@ async function getCodeBlock(req: Request, res: Response) {
 
 async function updateCodeBlock(req: Request, res: Response) {
   try {
-    const codeBlock = req.body
+    const codeBlock: ICodeBlock = req.body
     const updatedCodeBlock = await codeBlockService.update(codeBlock)
     res.json(updatedCodeBlock)
   } catch (err) {
@@ -37,7 +38,7 @@ async function updateCodeBlock(req: Request, res: Response) {
 
 async function addCodeBlock(req: Request, res: Response) {
   try {
-    const codeBlock = req.body
+    const codeBlock: ICodeBlock = req.body
     const addedCodeBlock = await codeBlockService.add(codeBlock)
     res.json(addedCodeBlock)
   } catch (err) {

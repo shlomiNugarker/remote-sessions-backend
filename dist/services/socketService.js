@@ -9,6 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = {
+    connectSockets,
+};
 let gIo;
 let gConnectedSockets = [];
 const gWatchersOnCodeBlocks = {};
@@ -24,6 +27,8 @@ function connectSockets(http, session) {
         // when code-block saved, updating other users:
         socket.on('code-block-saved', (codeBlock) => __awaiter(this, void 0, void 0, function* () {
             var _a;
+            if (!codeBlock._id)
+                return;
             const socketsIdsToUpdate = (_a = gWatchersOnCodeBlocks[codeBlock._id]) === null || _a === void 0 ? void 0 : _a.filter((socketId) => socketId !== socket.id);
             if (socketsIdsToUpdate === null || socketsIdsToUpdate === void 0 ? void 0 : socketsIdsToUpdate.length) {
                 socketsIdsToUpdate.forEach((socketId) => __awaiter(this, void 0, void 0, function* () {
@@ -55,7 +60,8 @@ function connectSockets(http, session) {
         }));
     });
 }
-function emitToSocket({ type, data, socketId }) {
+// Functions:
+function emitToSocket({ type, data, socketId, }) {
     return __awaiter(this, void 0, void 0, function* () {
         const socket = yield getSocketById(socketId);
         if (socket)
@@ -122,6 +128,3 @@ function removeSocketFromWatchers(codeBlockId, socketIdToRemove) {
         gWatchersOnCodeBlocks[codeBlockId] = gWatchersOnCodeBlocks[codeBlockId].filter((socketId) => socketId !== socketIdToRemove);
     }
 }
-exports.default = {
-    connectSockets,
-};
