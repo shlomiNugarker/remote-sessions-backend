@@ -15,7 +15,7 @@ exports.default = {
 let gIo;
 let gConnectedSockets = [];
 const gWatchersOnCodeBlocks = {};
-function connectSockets(http, session) {
+function connectSockets(http, _session) {
     gIo = require('socket.io')(http, {
         cors: {
             origin: '*',
@@ -45,7 +45,7 @@ function connectSockets(http, session) {
             addSocketToWatchers(codeBlockId, socket);
             send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId);
         }));
-        // when someone leave the code-block-page
+        // when someone left the code-block-page
         socket.on('someone-left-code-block', (codeBlockId) => __awaiter(this, void 0, void 0, function* () {
             removeSocketFromWatchers(codeBlockId, socket.id);
             yield send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId);
@@ -55,7 +55,7 @@ function connectSockets(http, session) {
             removeConnectedSocket(socket.id);
             find_And_Remove_Socket_In_Watcher_Sockets(socket.id);
             for (const codeBlockId in gWatchersOnCodeBlocks) {
-                send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId);
+                yield send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId);
             }
         }));
     });

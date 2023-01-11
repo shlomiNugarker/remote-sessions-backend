@@ -1,3 +1,4 @@
+import { ICodeBlock } from '../../interfaces/ICodeBlock'
 import dbService from '../../services/dbService'
 const ObjectId = require('mongodb').ObjectId
 
@@ -29,7 +30,7 @@ async function getById(codeId: string) {
   }
 }
 
-async function update(codeBlock: any) {
+async function update(codeBlock: ICodeBlock) {
   try {
     const id = new ObjectId(codeBlock._id)
     delete codeBlock._id

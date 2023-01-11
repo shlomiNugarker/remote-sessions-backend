@@ -14,7 +14,7 @@ interface IgWatchingOnCodeBlocks {
 let gConnectedSockets: string[] = []
 const gWatchersOnCodeBlocks: IgWatchingOnCodeBlocks = {}
 
-function connectSockets(http: any, session: any) {
+function connectSockets(http: any, _session: any) {
   gIo = require('socket.io')(http, {
     cors: {
       origin: '*',
@@ -44,7 +44,7 @@ function connectSockets(http: any, session: any) {
       addSocketToWatchers(codeBlockId, socket)
       send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
     })
-    // when someone leave the code-block-page
+    // when someone left the code-block-page
     socket.on('someone-left-code-block', async (codeBlockId) => {
       removeSocketFromWatchers(codeBlockId, socket.id)
       await send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
@@ -55,7 +55,7 @@ function connectSockets(http: any, session: any) {
       find_And_Remove_Socket_In_Watcher_Sockets(socket.id)
 
       for (const codeBlockId in gWatchersOnCodeBlocks) {
-        send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
+        await send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
       }
     })
   })
