@@ -43,7 +43,7 @@ function connectSockets(http, _session) {
         // when someone is watching the code-block-page
         socket.on('someone-enter-code-block', (codeBlockId) => __awaiter(this, void 0, void 0, function* () {
             addSocketToWatchers(codeBlockId, socket);
-            send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId);
+            yield send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId);
         }));
         // when someone left the code-block-page
         socket.on('someone-left-code-block', (codeBlockId) => __awaiter(this, void 0, void 0, function* () {

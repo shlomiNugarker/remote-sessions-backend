@@ -42,7 +42,7 @@ function connectSockets(http: any, _session: any) {
     // when someone is watching the code-block-page
     socket.on('someone-enter-code-block', async (codeBlockId) => {
       addSocketToWatchers(codeBlockId, socket)
-      send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
+      await send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
     })
     // when someone left the code-block-page
     socket.on('someone-left-code-block', async (codeBlockId) => {
