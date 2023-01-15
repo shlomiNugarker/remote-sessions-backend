@@ -7,6 +7,8 @@ import dotenv from 'dotenv'
 
 import codeBlockRoutes from './api/codeBlock/codeBlockRoutes'
 import socketService from './services/socketService'
+import authRoutes from './api/auth/authRoutes'
+import userRoutes from './api/user/userRoutes'
 
 dotenv.config()
 
@@ -34,6 +36,8 @@ if (process.env.NODE_ENV === 'production') {
   app.use(cors(corsOptions))
 }
 
+app.use('/api/auth', authRoutes)
+app.use('/api/user', userRoutes)
 app.use('/api/codeBlock', codeBlockRoutes)
 
 socketService.connectSockets(http, session)
