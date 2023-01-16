@@ -24,6 +24,7 @@ function connectSockets(http, _session) {
     });
     gIo.on('connection', (socket) => {
         addSocketToConnectedSockets(socket.id);
+        sendConnectedSockets();
         // when code-block saved, updating other users:
         socket.on('code-block-saved', (codeBlock) => __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -53,6 +54,7 @@ function connectSockets(http, _session) {
         // when browser disconnected
         socket.on('disconnect', () => __awaiter(this, void 0, void 0, function* () {
             removeConnectedSocket(socket.id);
+            sendConnectedSockets();
             find_And_Remove_Socket_In_Watcher_Sockets(socket.id);
             for (const codeBlockId in gWatchersOnCodeBlocks) {
                 yield send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId);
@@ -61,6 +63,15 @@ function connectSockets(http, _session) {
     });
 }
 // Functions:
+function sendConnectedSockets() {
+    gConnectedSockets.forEach((socketId) => __awaiter(this, void 0, void 0, function* () {
+        yield emitToSocket({
+            type: 'update-connected-sockets',
+            data: gConnectedSockets,
+            socketId,
+        });
+    }));
+}
 function emitToSocket({ type, data, socketId, }) {
     return __awaiter(this, void 0, void 0, function* () {
         const socket = yield getSocketById(socketId);

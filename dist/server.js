@@ -11,6 +11,8 @@ const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const codeBlockRoutes_1 = __importDefault(require("./api/codeBlock/codeBlockRoutes"));
 const socketService_1 = __importDefault(require("./services/socketService"));
+const authRoutes_1 = __importDefault(require("./api/auth/authRoutes"));
+const userRoutes_1 = __importDefault(require("./api/user/userRoutes"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const http = require('http').createServer(app);
@@ -33,6 +35,8 @@ else {
     };
     app.use((0, cors_1.default)(corsOptions));
 }
+app.use('/api/auth', authRoutes_1.default);
+app.use('/api/user', userRoutes_1.default);
 app.use('/api/codeBlock', codeBlockRoutes_1.default);
 socketService_1.default.connectSockets(http, session);
 app.get('/**', (req, res) => {
