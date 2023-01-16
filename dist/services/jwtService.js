@@ -7,9 +7,16 @@ const createTokens = (user) => {
     return accessToken;
 };
 const validateToken = (req, res, next) => {
+    var _a;
     const { headers: { cookie }, } = req;
+    let cookies = {};
+    const cookiesArray = (_a = req.headers.cookie) === null || _a === void 0 ? void 0 : _a.split(';');
+    cookiesArray === null || cookiesArray === void 0 ? void 0 : cookiesArray.forEach((cookie) => {
+        const [key, value] = cookie.trim().split('=');
+        cookies[key] = value;
+    });
     // get The "access-token" value:
-    const accessToken = cookie === null || cookie === void 0 ? void 0 : cookie.split('; ')[0].split('=')[1];
+    const accessToken = cookies['access-token'];
     if (!accessToken)
         return res.status(400).json({ error: 'User not Authenticated!' });
     try {
