@@ -23,6 +23,7 @@ function connectSockets(http: any, _session: any) {
   })
   gIo.on('connection', (socket: Socket) => {
     addSocketToConnectedSockets(socket.id)
+    sendConnectedSockets()
     // when code-block saved, updating other users:
     socket.on('code-block-saved', async (codeBlock: ICodeBlock) => {
       if (!codeBlock._id) return
@@ -52,6 +53,7 @@ function connectSockets(http: any, _session: any) {
     // when browser disconnected
     socket.on('disconnect', async () => {
       removeConnectedSocket(socket.id)
+      sendConnectedSockets()
       find_And_Remove_Socket_In_Watcher_Sockets(socket.id)
 
       for (const codeBlockId in gWatchersOnCodeBlocks) {
@@ -63,13 +65,23 @@ function connectSockets(http: any, _session: any) {
 
 // Functions:
 
-async function emitToSocket({
+function sendConnectedSockets() {
+  gConnectedSockets.forEach(async (socketId) => {
+    await emitToSocket({
+      type: 'update-connected-sockets',
+      data: gConnectedSockets,
+      socketId,
+    })
+  })
+}
+
+async function emitToSocket<T>({
   type,
   data,
   socketId,
 }: {
   type: string
-  data: ICodeBlock
+  data: T
   socketId: string
 }) {
   const socket = await getSocketById(socketId)
