@@ -15,11 +15,16 @@ async function login(userName: string, password: string) {
   return user
 }
 
-async function signup(userName: string, password: string, fullName: string) {
+async function signup(
+  userName: string,
+  password: string,
+  fullName: string,
+  isMentor: boolean
+) {
   const saltRounds = 10
   if (!userName || !password || !fullName)
     return Promise.reject('fullName, userName and password are required!')
 
   const hash = await bcrypt.hash(password, saltRounds)
-  return userService.add({ userName, password: hash, fullName })
+  return userService.add({ userName, password: hash, fullName, isMentor })
 }
