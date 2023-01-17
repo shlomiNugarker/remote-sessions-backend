@@ -23,8 +23,12 @@ function connectSockets(http, _session) {
         },
     });
     gIo.on('connection', (socket) => {
+        // when new socket connected:
         addSocketToConnectedSockets(socket.id);
         sendConnectedSockets();
+        // **
+        console.log('connection');
+        console.log({ gConnectedSockets, gWatchersOnCodeBlocks });
         // when code-block saved, updating other users:
         socket.on('code-block-saved', (codeBlock) => __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -40,16 +44,25 @@ function connectSockets(http, _session) {
                     });
                 }));
             }
+            // **
+            console.log('code-block-saved');
+            console.log({ gConnectedSockets, gWatchersOnCodeBlocks });
         }));
         // when someone is watching the code-block-page
         socket.on('someone-enter-code-block', (codeBlockId) => __awaiter(this, void 0, void 0, function* () {
             addSocketToWatchers(codeBlockId, socket);
             yield send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId);
+            // **
+            console.log('someone-enter-code-block');
+            console.log({ gConnectedSockets, gWatchersOnCodeBlocks });
         }));
         // when someone left the code-block-page
         socket.on('someone-left-code-block', (codeBlockId) => __awaiter(this, void 0, void 0, function* () {
             removeSocketFromWatchers(codeBlockId, socket.id);
             yield send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId);
+            // **
+            console.log('someone-left-code-block');
+            console.log({ gConnectedSockets, gWatchersOnCodeBlocks });
         }));
         // when browser disconnected
         socket.on('disconnect', () => __awaiter(this, void 0, void 0, function* () {
@@ -59,6 +72,9 @@ function connectSockets(http, _session) {
             for (const codeBlockId in gWatchersOnCodeBlocks) {
                 yield send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId);
             }
+            // **
+            console.log('disconnect');
+            console.log({ gConnectedSockets, gWatchersOnCodeBlocks });
         }));
     });
 }
