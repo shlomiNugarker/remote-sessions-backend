@@ -26,11 +26,6 @@ function connectSockets(http: any, _session: any) {
     addSocketToConnectedSockets(socket.id)
     sendConnectedSockets()
 
-    // **
-    console.log('connection')
-    console.log({ gConnectedSockets, gWatchersOnCodeBlocks })
-    // **
-
     // when code-block saved, updating other users:
     socket.on('code-block-saved', async (codeBlock: ICodeBlock) => {
       if (!codeBlock._id) return
@@ -46,31 +41,16 @@ function connectSockets(http: any, _session: any) {
           })
         })
       }
-
-      // **
-      console.log('code-block-saved')
-      console.log({ gConnectedSockets, gWatchersOnCodeBlocks })
-      // **
     })
     // when someone is watching the code-block-page
     socket.on('someone-enter-code-block', async (codeBlockId) => {
       addSocketToWatchers(codeBlockId, socket)
       await send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
-
-      // **
-      console.log('someone-enter-code-block')
-      console.log({ gConnectedSockets, gWatchersOnCodeBlocks })
-      // **
     })
     // when someone left the code-block-page
     socket.on('someone-left-code-block', async (codeBlockId) => {
       removeSocketFromWatchers(codeBlockId, socket.id)
       await send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
-
-      // **
-      console.log('someone-left-code-block')
-      console.log({ gConnectedSockets, gWatchersOnCodeBlocks })
-      // **
     })
     // when browser disconnected
     socket.on('disconnect', async (args) => {
@@ -78,15 +58,9 @@ function connectSockets(http: any, _session: any) {
       gConnectedSockets = await getAllSocketsIds()
       sendConnectedSockets()
       find_And_Remove_Socket_In_Watcher_Sockets(socket.id)
-
       for (const codeBlockId in gWatchersOnCodeBlocks) {
         await send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId)
       }
-
-      // **
-      console.log('disconnect')
-      console.log({ gConnectedSockets, gWatchersOnCodeBlocks })
-      // **
     })
   })
 }
@@ -102,7 +76,6 @@ function sendConnectedSockets() {
     })
   })
 }
-
 async function emitToSocket<T>({
   type,
   data,
@@ -129,7 +102,6 @@ async function getAllSockets() {
   const sockets: Socket[] = await gIo.fetchSockets()
   return sockets
 }
-
 async function getAllSocketsIds() {
   const sockets: Socket[] = await gIo.fetchSockets()
   const socketsIds: string[] = []
@@ -137,7 +109,6 @@ async function getAllSocketsIds() {
   sockets.forEach((socket) => {
     socketsIds.push(socket.id)
   })
-
   return socketsIds
 }
 // sending watchers to all sockets who watching the specific code-block:
