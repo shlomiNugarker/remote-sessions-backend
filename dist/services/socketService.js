@@ -29,6 +29,7 @@ function connectSockets(http, _session) {
         // **
         console.log('connection');
         console.log({ gConnectedSockets, gWatchersOnCodeBlocks });
+        // **
         // when code-block saved, updating other users:
         socket.on('code-block-saved', (codeBlock) => __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -47,6 +48,7 @@ function connectSockets(http, _session) {
             // **
             console.log('code-block-saved');
             console.log({ gConnectedSockets, gWatchersOnCodeBlocks });
+            // **
         }));
         // when someone is watching the code-block-page
         socket.on('someone-enter-code-block', (codeBlockId) => __awaiter(this, void 0, void 0, function* () {
@@ -55,6 +57,7 @@ function connectSockets(http, _session) {
             // **
             console.log('someone-enter-code-block');
             console.log({ gConnectedSockets, gWatchersOnCodeBlocks });
+            // **
         }));
         // when someone left the code-block-page
         socket.on('someone-left-code-block', (codeBlockId) => __awaiter(this, void 0, void 0, function* () {
@@ -63,10 +66,12 @@ function connectSockets(http, _session) {
             // **
             console.log('someone-left-code-block');
             console.log({ gConnectedSockets, gWatchersOnCodeBlocks });
+            // **
         }));
         // when browser disconnected
-        socket.on('disconnect', () => __awaiter(this, void 0, void 0, function* () {
-            removeConnectedSocket(socket.id);
+        socket.on('disconnect', (args) => __awaiter(this, void 0, void 0, function* () {
+            // removeConnectedSocket(socket.id)
+            gConnectedSockets = yield getAllSocketsIds();
             sendConnectedSockets();
             find_And_Remove_Socket_In_Watcher_Sockets(socket.id);
             for (const codeBlockId in gWatchersOnCodeBlocks) {
@@ -75,6 +80,7 @@ function connectSockets(http, _session) {
             // **
             console.log('disconnect');
             console.log({ gConnectedSockets, gWatchersOnCodeBlocks });
+            // **
         }));
     });
 }
@@ -115,6 +121,16 @@ function getAllSockets() {
         return sockets;
     });
 }
+function getAllSocketsIds() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const sockets = yield gIo.fetchSockets();
+        const socketsIds = [];
+        sockets.forEach((socket) => {
+            socketsIds.push(socket.id);
+        });
+        return socketsIds;
+    });
+}
 // sending watchers to all sockets who watching the specific code-block:
 function send_Watcher_On_Code_Block_To_Others_Watchers(codeBlockId) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -153,5 +169,10 @@ function addSocketToWatchers(codeBlockId, socket) {
 function removeSocketFromWatchers(codeBlockId, socketIdToRemove) {
     if (gWatchersOnCodeBlocks[codeBlockId]) {
         gWatchersOnCodeBlocks[codeBlockId] = gWatchersOnCodeBlocks[codeBlockId].filter((socketId) => socketId !== socketIdToRemove);
+    }
+    // if the key is empty, delete the key:
+    if (gWatchersOnCodeBlocks[codeBlockId] &&
+        !gWatchersOnCodeBlocks[codeBlockId].length) {
+        delete gWatchersOnCodeBlocks[codeBlockId];
     }
 }
