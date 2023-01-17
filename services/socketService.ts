@@ -29,6 +29,7 @@ function connectSockets(http: any, _session: any) {
     // **
     console.log('connection')
     console.log({ gConnectedSockets, gWatchersOnCodeBlocks })
+    // **
 
     // when code-block saved, updating other users:
     socket.on('code-block-saved', async (codeBlock: ICodeBlock) => {
@@ -49,6 +50,7 @@ function connectSockets(http: any, _session: any) {
       // **
       console.log('code-block-saved')
       console.log({ gConnectedSockets, gWatchersOnCodeBlocks })
+      // **
     })
     // when someone is watching the code-block-page
     socket.on('someone-enter-code-block', async (codeBlockId) => {
@@ -58,6 +60,7 @@ function connectSockets(http: any, _session: any) {
       // **
       console.log('someone-enter-code-block')
       console.log({ gConnectedSockets, gWatchersOnCodeBlocks })
+      // **
     })
     // when someone left the code-block-page
     socket.on('someone-left-code-block', async (codeBlockId) => {
@@ -67,10 +70,12 @@ function connectSockets(http: any, _session: any) {
       // **
       console.log('someone-left-code-block')
       console.log({ gConnectedSockets, gWatchersOnCodeBlocks })
+      // **
     })
     // when browser disconnected
-    socket.on('disconnect', async () => {
-      removeConnectedSocket(socket.id)
+    socket.on('disconnect', async (args) => {
+      // removeConnectedSocket(socket.id)
+      gConnectedSockets = await getAllSocketsIds()
       sendConnectedSockets()
       find_And_Remove_Socket_In_Watcher_Sockets(socket.id)
 
@@ -81,6 +86,7 @@ function connectSockets(http: any, _session: any) {
       // **
       console.log('disconnect')
       console.log({ gConnectedSockets, gWatchersOnCodeBlocks })
+      // **
     })
   })
 }
@@ -122,6 +128,17 @@ async function getAllSockets() {
   if (!gIo) return
   const sockets: Socket[] = await gIo.fetchSockets()
   return sockets
+}
+
+async function getAllSocketsIds() {
+  const sockets: Socket[] = await gIo.fetchSockets()
+  const socketsIds: string[] = []
+
+  sockets.forEach((socket) => {
+    socketsIds.push(socket.id)
+  })
+
+  return socketsIds
 }
 // sending watchers to all sockets who watching the specific code-block:
 async function send_Watcher_On_Code_Block_To_Others_Watchers(
@@ -171,5 +188,12 @@ function removeSocketFromWatchers(
     gWatchersOnCodeBlocks[codeBlockId] = gWatchersOnCodeBlocks[
       codeBlockId
     ].filter((socketId) => socketId !== socketIdToRemove)
+  }
+  // if the key is empty, delete the key:
+  if (
+    gWatchersOnCodeBlocks[codeBlockId] &&
+    !gWatchersOnCodeBlocks[codeBlockId].length
+  ) {
+    delete gWatchersOnCodeBlocks[codeBlockId]
   }
 }
