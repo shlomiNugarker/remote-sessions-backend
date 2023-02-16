@@ -6,7 +6,8 @@ import { sign, verify } from 'jsonwebtoken'
 const createTokens = (user: any) => {
   const accessToken = sign(
     { username: user.userName, id: user._id },
-    process.env.TOKEN_SECRET as string
+    process.env.TOKEN_SECRET as string,
+    { expiresIn: '24h' }
   )
 
   return accessToken

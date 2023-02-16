@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.jwtService = void 0;
 const jsonwebtoken_1 = require("jsonwebtoken");
 const createTokens = (user) => {
-    const accessToken = (0, jsonwebtoken_1.sign)({ username: user.userName, id: user._id }, process.env.TOKEN_SECRET);
+    const accessToken = (0, jsonwebtoken_1.sign)({ username: user.userName, id: user._id }, process.env.TOKEN_SECRET, { expiresIn: '24h' });
     return accessToken;
 };
 const validateToken = (req, res, next) => {
