@@ -22,10 +22,6 @@ declare global {
 }
 
 const validateToken = (req: Request, res: Response, next: NextFunction) => {
-  const {
-    headers: { cookie },
-  } = req
-
   let cookies: { [key: string]: string } = {}
 
   const cookiesArray = req.headers.cookie?.split(';')
